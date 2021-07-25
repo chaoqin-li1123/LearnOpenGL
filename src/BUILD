@@ -2,8 +2,46 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("@rules_foreign_cc//tools/build_defs:cmake.bzl", "cmake_external")
 
 cc_binary(
-    name = "spheres",
-    srcs = ["spheres.cc"],
+    name = "monkey",
+    srcs = ["monkey.cc"],
+    linkopts = ["-lGLEW", "-lglfw", "-lGL"], 
+    deps = ["gl_util"] 
+)
+
+cc_binary(
+    name = "texture_cube",
+    srcs = ["texture_cube.cc"],
+    linkopts = ["-lGLEW", "-lglfw", "-lGL"], 
+    deps = ["gl_util"] 
+)
+
+cc_binary(
+    name = "color_cube",
+    srcs = ["color_cube.cc"],
+    linkopts = ["-lGLEW", "-lglfw", "-lGL"], 
+    deps = ["gl_util"] 
+)
+
+cc_library(
+    name = "gl_util",
+    hdrs = ["gl_util.hpp"]
+)
+
+cc_binary(
+    name = "texture",
+    srcs = ["texture.cc"],
+    linkopts = ["-lglut", "-lGLEW", "-lGL", "-lGLU"]    
+)
+
+cc_binary(
+    name = "fog",
+    srcs = ["fog.cc"],
+    linkopts = ["-lglut", "-lGLU", "-lGL"]    
+)
+
+cc_binary(
+    name = "sphere",
+    srcs = ["sphere.cc"],
     linkopts = ["-lglut", "-lGLU", "-lGL"]    
 )
 
@@ -50,12 +88,6 @@ cc_library(
     deps = ["@eigen", "opencv", "triangle"]
 )
 
-cc_library(
-    name = "triangle",
-    srcs = ["triangle.cpp"],
-    hdrs = ["triangle.hpp"],
-    deps = ["@eigen"]   
-)
 
 cmake_external(
     name = "opencv",
