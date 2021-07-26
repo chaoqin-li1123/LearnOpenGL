@@ -81,20 +81,16 @@ struct Shader {
 };
 
 struct CheckBoardShader {
-  CheckBoardShader(float interval)
+  CheckBoardShader()
       : program_("blinn_phong/checkboard.vert", "blinn_phong/checkboard.frag") {
-    for (float x1 = -1.0; x1 < 1.0f; x1 += interval) {
-      float x2 = std::min(1.0f, x1 + interval);
-      for (float y1 = -1.0; y1 < 1.0f; y1 += interval) {
-        float y2 = std::min(1.0f, y1 + interval);
-        vertices_.emplace_back(x1, y1, 0.0);
-        vertices_.emplace_back(x1, y2, 0.0);
-        vertices_.emplace_back(x2, y1, 0.0);
-        vertices_.emplace_back(x1, y2, 0.0);
-        vertices_.emplace_back(x2, y2, 0.0);
-        vertices_.emplace_back(x2, y1, 0.0);
-      }
-    }
+    float x1 = -1.0, x2 = 1.0, y1 = -1.0, y2 = 1.0;
+    vertices_.emplace_back(x1, y1, -1.0);
+    vertices_.emplace_back(x1, y2, -1.0);
+    vertices_.emplace_back(x2, y1, -1.0);
+    vertices_.emplace_back(x1, y2, -1.0);
+    vertices_.emplace_back(x2, y2, -1.0);
+    vertices_.emplace_back(x2, y1, -1.0);
+
     initVAO();
     initVBO();
   }

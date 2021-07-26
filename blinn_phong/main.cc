@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 
   Shader shader("blinn_phong/blinn_phong.vert", "blinn_phong/blinn_phong.frag",
                 "input/suzanne.obj", "input/uvmap.DDS");
-  CheckBoardShader background(0.3);
+  CheckBoardShader background;
   do {
     // Clear the screen.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
