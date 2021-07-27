@@ -26,7 +26,7 @@ void main(){
     // Caculate specular component.
     vec3 halfway_direction = normalize(light_direction + view_direction);
     float cos_alpha = max(dot(normal_direction, halfway_direction), 0.0);
-    float specular_factor;
+    float specular_factor = 0.0;
     if (cos_alpha > 0.0) specular_factor = pow(cos_alpha, 32.0);
     vec3 specular = specular_factor * vec3(0.3);
 
