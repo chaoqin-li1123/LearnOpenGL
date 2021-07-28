@@ -8,7 +8,6 @@ void initGlobal() {
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
-  // glEnable(GL_CULL_FACE);
 }
 
 GLFWwindow* initWindow(const char* window_name) {

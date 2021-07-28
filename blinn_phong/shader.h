@@ -57,6 +57,7 @@ struct Shader {
   }
 
   void display() {
+    glEnable(GL_CULL_FACE);
     program_.bind();
     texture_.bind(program_.id(), "texture_sampler");
     bindTransformation();
@@ -65,6 +66,7 @@ struct Shader {
     object_.display();
     // clean up the vertex array attributes.
     object_.unbind();
+    glDisable(GL_CULL_FACE);
   }
 
  private:
