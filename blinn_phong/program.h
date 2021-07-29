@@ -5,21 +5,28 @@
 struct Program {
   Program(const char* vertex_shader_file, const char* fragment_shader_file) {
     GLuint vertex_shader = loadShader(vertex_shader_file, GL_VERTEX_SHADER);
+    GLuint tess_control_shader = loadShader(
+        "blinn_phong/adjust_by_distance.tcs", GL_TESS_CONTROL_SHADER);
+    GLuint tess_evaluation_shader =
+        loadShader("blinn_phong/passthrough.tes", GL_TESS_EVALUATION_SHADER);
     GLuint fragment_shader =
         loadShader(fragment_shader_file, GL_FRAGMENT_SHADER);
-    compileShader(vertex_shader);
-    compileShader(fragment_shader);
-
+    std::vector<GLuint> shader_ids{vertex_shader, tess_control_shader,
+                                   tess_evaluation_shader, fragment_shader};
     program_id_ = glCreateProgram();
-    glAttachShader(program_id_, vertex_shader);
-    glAttachShader(program_id_, fragment_shader);
+    for (GLuint shader_id : shader_ids) {
+      glAttachShader(program_id_, shader_id);
+    }
     linkProgram();
 
-    glDetachShader(program_id_, vertex_shader);
-    glDetachShader(program_id_, fragment_shader);
+    for (GLuint shader_id : shader_ids) {
+      glDetachShader(program_id_, shader_id);
+    }
 
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
+    for (GLuint shader_id : shader_ids) {
+      glDeleteShader(shader_id);
+    }
+    glPatchParameteri(GL_PATCH_VERTICES, 3);
   }
 
   GLuint id() { return program_id_; }
@@ -27,12 +34,13 @@ struct Program {
   void bind() { glUseProgram(program_id_); }
 
  private:
-  GLuint loadShader(const char* shader_file, GLuint shader_type) {
+  GLuint loadShader(const char* shader_file, GLenum shader_type) {
     printf("Loading shader : %s\n", shader_file);
     GLuint shader_id = glCreateShader(shader_type);
     std::string shader_source_str = readFile(shader_file);
     const char* shader_source_cstr = shader_source_str.c_str();
     glShaderSource(shader_id, 1, &shader_source_cstr, NULL);
+    compileShader(shader_id);
     return shader_id;
   }
 

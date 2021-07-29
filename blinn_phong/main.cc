@@ -8,6 +8,8 @@ void initGlobal() {
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
+  glEnable(GL_CULL_FACE);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 GLFWwindow* initWindow(const char* window_name) {
@@ -18,8 +20,8 @@ GLFWwindow* initWindow(const char* window_name) {
   }
   // Antialiasing
   glfwWindowHint(GLFW_SAMPLES, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // Open a window.
@@ -35,20 +37,22 @@ GLFWwindow* initWindow(const char* window_name) {
   return window;
 }
 
+void dispalyCheckBord() {
+  static CheckBoardShader background;
+  background.display();
+}
+
 int main(int argc, char** argv) {
   GLFWwindow* window = initWindow("monkey_head");
   initGlobal();
 
-  Shader shader("blinn_phong/blinn_phong.vert", "blinn_phong/blinn_phong.frag",
+  Shader shader("blinn_phong/blinn_phong.vs", "blinn_phong/blinn_phong.fs",
                 "input/suzanne.obj", "input/uvmap.DDS");
-  CheckBoardShader background;
+
   do {
     // Clear the screen.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //
     shader.display();
-    background.display();
-
     // Swap buffers
     glfwSwapBuffers(window);
     glfwPollEvents();

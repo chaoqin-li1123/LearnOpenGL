@@ -1,6 +1,10 @@
-#version 330 core
+#version 450 core
 
-in VS_OUT
+layout(location = 0) in vec3 vertex_position_model_space;
+layout(location = 1) in vec2 vertex_uv;
+layout(location = 2) in vec3 vertex_normal_model_space;
+
+in TES_OUT
 {
     in vec3 vertex_position_camera_space;
     in vec2 uv;
@@ -10,6 +14,8 @@ in VS_OUT
 uniform sampler2D texture_sampler;
 uniform vec3 light_position_camera_space;
 uniform vec3 light_color;
+
+out vec3 color;
 
 void main(){
     // Output color = color of the texture at the specified UV
@@ -33,6 +39,6 @@ void main(){
     if (cos_alpha > 0.0) specular_factor = pow(cos_alpha, 32.0);
     vec3 specular = specular_factor * vec3(0.3);
 
-
-    gl_FragColor = vec4(specular + diffuse + ambient, 0.0);
+    float gamma = 2.2;
+    color = pow(specular + diffuse + ambient, vec3(1.0/gamma));
 }

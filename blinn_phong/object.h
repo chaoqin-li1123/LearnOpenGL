@@ -14,6 +14,9 @@ struct Object {
     std::vector<glm::vec3> normals;
     loadOBJ(obj, vertices, uvs, normals);
     indexVBO(vertices, uvs, normals);
+  }
+
+  void init() {
     initVAO();
     initVBO();
   }
@@ -73,7 +76,7 @@ struct Object {
 
   void bind(GLuint program_id) {
     // Bind VAO.
-
+    init();
     // Bind vertices buffer..
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
@@ -115,7 +118,7 @@ struct Object {
   }
 
   void display() {
-    glDrawElements(GL_TRIANGLES,     // mode
+    glDrawElements(GL_PATCHES,       // mode
                    indices.size(),   // count
                    GL_UNSIGNED_INT,  // type
                    (void *)0         // element array buffer offset

@@ -1,13 +1,16 @@
-#version 330 core
+#version 450 core
 layout(location = 0) in vec3 vertex_position_model_space;
 layout(location = 1) in vec2 vertex_uv;
 layout(location = 2) in vec3 vertex_normal_model_space;
+
 
 out VS_OUT {
     out vec3 vertex_position_camera_space;
     out vec2 uv; // Texture coordinate.
     out vec3 normal_camera_space;
 } vs_out;
+
+out float view_distance;
 
 
 
@@ -24,4 +27,6 @@ void main(){
     vs_out.normal_camera_space = normalize((model_view * vec4(vertex_normal_model_space, 0.0)).xyz);
 
     gl_Position = MVP * vec4(vertex_position_model_space, 1.0);
+
+    view_distance = length(vs_out.vertex_position_camera_space);
 }

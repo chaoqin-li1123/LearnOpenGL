@@ -22,7 +22,7 @@ struct Shader {
   void initTransformation() {
     model_ = glm::mat4(1.0f);
     // TODO: allow user to change view using the mouse or keyboard.
-    glm::vec3 look_from = glm::vec3(4.0f, 4.0f, 4.0f);
+    glm::vec3 look_from = glm::vec3(1.5f, 1.5f, 1.5f);
     glm::vec3 look_at = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
     view_ = glm::lookAt(look_from, look_at, up);
@@ -31,7 +31,7 @@ struct Shader {
 
     float field_of_view = 50.0f;
     float aspect_ratio = 4.0f / 3.0f;
-    float near_z = 1.0f, far_z = 100.0f;
+    float near_z = 0.01f, far_z = 100.0f;
     projection_ = glm::perspective(glm::radians(field_of_view), aspect_ratio,
                                    near_z, far_z);
 
@@ -57,7 +57,6 @@ struct Shader {
   }
 
   void display() {
-    glEnable(GL_CULL_FACE);
     program_.bind();
     texture_.bind(program_.id(), "texture_sampler");
     bindTransformation();
@@ -66,7 +65,6 @@ struct Shader {
     object_.display();
     // clean up the vertex array attributes.
     object_.unbind();
-    glDisable(GL_CULL_FACE);
   }
 
  private:
@@ -84,14 +82,16 @@ struct Shader {
 
 struct CheckBoardShader {
   CheckBoardShader()
-      : program_("blinn_phong/checkboard.vert", "blinn_phong/checkboard.frag") {
-    float x1 = -1.0, x2 = 1.0, y1 = -1.0, y2 = 1.0;
+      : program_("blinn_phong/checkboard.vs", "blinn_phong/checkboard.fs") {
+    float x1 = -0.9, x2 = 0.9, y1 = -0.9, y2 = 0.9;
+
+    vertices_.emplace_back(x2, y1, -1.0);
+    vertices_.emplace_back(x1, y2, -1.0);
     vertices_.emplace_back(x1, y1, -1.0);
-    vertices_.emplace_back(x1, y2, -1.0);
+
     vertices_.emplace_back(x2, y1, -1.0);
-    vertices_.emplace_back(x1, y2, -1.0);
     vertices_.emplace_back(x2, y2, -1.0);
-    vertices_.emplace_back(x2, y1, -1.0);
+    vertices_.emplace_back(x1, y2, -1.0);
 
     initVAO();
     initVBO();
