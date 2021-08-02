@@ -3,16 +3,12 @@
 #include "gl_util.h"
 
 struct Program {
-  Program(const char* vertex_shader_file, const char* fragment_shader_file) {
-    GLuint vertex_shader = loadShader(vertex_shader_file, GL_VERTEX_SHADER);
-    GLuint tess_control_shader = loadShader(
-        "blinn_phong/adjust_by_distance.tcs", GL_TESS_CONTROL_SHADER);
-    GLuint tess_evaluation_shader =
-        loadShader("blinn_phong/passthrough.tes", GL_TESS_EVALUATION_SHADER);
-    GLuint fragment_shader =
-        loadShader(fragment_shader_file, GL_FRAGMENT_SHADER);
-    std::vector<GLuint> shader_ids{vertex_shader, tess_control_shader,
-                                   tess_evaluation_shader, fragment_shader};
+  Program(std::vector<const char*> shader_files,
+          std::vector<GLenum> shader_types) {
+    std::vector<GLuint> shader_ids;
+    for (size_t i = 0; i < shader_files.size(); i++) {
+      shader_ids.push_back(loadShader(shader_files[i], shader_types[i]));
+    }
     program_id_ = glCreateProgram();
     for (GLuint shader_id : shader_ids) {
       glAttachShader(program_id_, shader_id);

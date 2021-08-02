@@ -11,7 +11,7 @@ in TES_OUT
     in vec3 normal_camera_space;
 } fs_in;
 
-uniform sampler2D texture_sampler;
+layout (binding = 0) uniform sampler2D texture_sampler;
 uniform vec3 light_position_camera_space;
 uniform vec3 light_color;
 

@@ -11,7 +11,19 @@ cc_binary(
 cc_library(
     name = "shader",
     hdrs = ["shader.h"],
-    deps = ["gl_util", "texture", "object", "program", "light"]
+    deps = ["gl_util", "texture", "object", "program", "light", "transformation", "curve"]
+)
+
+cc_library(
+    name = "curve",
+    hdrs = ["curve.h"],
+    deps = ["gl_util"]
+)
+
+cc_library(
+    name = "transformation",
+    hdrs = ["transformation.h"],
+    deps = ["gl_util"]
 )
 
 cc_library(

@@ -46,12 +46,13 @@ int main(int argc, char** argv) {
   GLFWwindow* window = initWindow("monkey_head");
   initGlobal();
 
-  Shader shader("blinn_phong/blinn_phong.vs", "blinn_phong/blinn_phong.fs",
-                "input/suzanne.obj", "input/uvmap.DDS");
+  BlinnPhongShader shader("input/suzanne.obj", "input/uvmap.DDS");
+  // CheckBoardShader background;
 
   do {
     // Clear the screen.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // background.display();
     shader.display();
     // Swap buffers
     glfwSwapBuffers(window);

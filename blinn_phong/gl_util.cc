@@ -167,7 +167,7 @@ GLuint loadDDS(const char *imagepath) {
 
   // Create one OpenGL texture
   GLuint textureID;
-  glGenTextures(1, &textureID);
+  glCreateTextures(GL_TEXTURE_2D, 1, &textureID);
 
   // "Bind" the newly created texture : all future texture functions will modify
   // this texture

@@ -14,6 +14,8 @@ struct Object {
     std::vector<glm::vec3> normals;
     loadOBJ(obj, vertices, uvs, normals);
     indexVBO(vertices, uvs, normals);
+    // Bind VAO.
+    init();
   }
 
   void init() {
@@ -48,67 +50,73 @@ struct Object {
   }
 
   void initVAO() {
-    glGenVertexArrays(1, &vertex_array_id_);
+    glCreateVertexArrays(1, &vertex_array_id_);
     glBindVertexArray(vertex_array_id_);
   }
 
   void initVBO() {
-    glGenBuffers(1, &vertex_buffer_);
+    glCreateBuffers(1, &vertex_buffer_);
+    glNamedBufferStorage(vertex_buffer_,
+                         indexed_vertices_.size() * sizeof(glm::vec3),
+                         &indexed_vertices_[0], GL_MAP_READ_BIT);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
-    glBufferData(GL_ARRAY_BUFFER, indexed_vertices_.size() * sizeof(glm::vec3),
-                 &indexed_vertices_[0], GL_STATIC_DRAW);
 
-    glGenBuffers(1, &uv_buffer_);
+    glCreateBuffers(1, &uv_buffer_);
+    glNamedBufferStorage(uv_buffer_, indexed_uvs_.size() * sizeof(glm::vec2),
+                         &indexed_uvs_[0], GL_MAP_READ_BIT);
     glBindBuffer(GL_ARRAY_BUFFER, uv_buffer_);
-    glBufferData(GL_ARRAY_BUFFER, indexed_uvs_.size() * sizeof(glm::vec2),
-                 &indexed_uvs_[0], GL_STATIC_DRAW);
 
-    glGenBuffers(1, &normal_buffer_);
+    glCreateBuffers(1, &normal_buffer_);
+    glNamedBufferStorage(normal_buffer_,
+                         indexed_normals_.size() * sizeof(glm::vec3),
+                         &indexed_normals_[0], GL_MAP_READ_BIT);
     glBindBuffer(GL_ARRAY_BUFFER, normal_buffer_);
-    glBufferData(GL_ARRAY_BUFFER, indexed_normals_.size() * sizeof(glm::vec3),
-                 &indexed_normals_[0], GL_STATIC_DRAW);
 
-    glGenBuffers(1, &element_buffer_);
+    glCreateBuffers(1, &element_buffer_);
+    glNamedBufferStorage(element_buffer_, indices.size() * sizeof(size_t),
+                         &indices[0], GL_MAP_READ_BIT);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(size_t),
-                 &indices[0], GL_STATIC_DRAW);
   }
 
   void bind(GLuint program_id) {
-    // Bind VAO.
-    init();
     // Bind vertices buffer..
+    glVertexArrayVertexBuffer(vertex_array_id_, 0, vertex_buffer_, 0,
+                              sizeof(glm::vec3));
+    glVertexArrayAttribFormat(vertex_array_id_,  // vao
+                              0,                 // attribute 0.
+                              3,                 // size
+                              GL_FLOAT,          // type
+                              GL_FALSE,          // normalized?
+                              0                  // array buffer offset
+    );
+    glVertexArrayAttribBinding(vertex_array_id_, 0, 0);
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
-    glVertexAttribPointer(0,         // attribute 0.
-                          3,         // size
-                          GL_FLOAT,  // type
-                          GL_FALSE,  // normalized?
-                          0,         // stride
-                          (void *)0  // array buffer offset
-    );
-    // Bind uv(texture index) buffer.
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, uv_buffer_);
-    glVertexAttribPointer(1,         // attribute 1.
-                          2,         // size
-                          GL_FLOAT,  // type
-                          GL_FALSE,  // normalized?
-                          0,         // stride
-                          (void *)0  // array buffer offset
-    );
-    // Bind vertex normal buffer.
-    glEnableVertexAttribArray(2);
-    glBindBuffer(GL_ARRAY_BUFFER, normal_buffer_);
-    glVertexAttribPointer(2,         // attribute 1.
-                          3,         // size
-                          GL_FLOAT,  // type
-                          GL_FALSE,  // normalized?
-                          0,         // stride
-                          (void *)0  // array buffer offset
-    );
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_);
+    // Bind uv(texture index) buffer.
+    glVertexArrayVertexBuffer(vertex_array_id_, 1, uv_buffer_, 0,
+                              sizeof(glm::vec2));
+    glVertexArrayAttribFormat(vertex_array_id_,  // vao
+                              1,                 // attribute 1.
+                              2,                 // size
+                              GL_FLOAT,          // type
+                              GL_FALSE,          // normalized?
+                              0                  // array buffer offset
+    );
+    glVertexArrayAttribBinding(vertex_array_id_, 1, 1);
+    glEnableVertexAttribArray(1);
+
+    // Bind vertex normal buffer.
+    glVertexArrayVertexBuffer(vertex_array_id_, 2, normal_buffer_, 0,
+                              sizeof(glm::vec3));
+    glVertexArrayAttribFormat(vertex_array_id_,  // vao
+                              2,                 // attribute 2.
+                              3,                 // size
+                              GL_FLOAT,          // type
+                              GL_FALSE,          // normalized?
+                              0                  // array buffer offset
+    );
+    glVertexArrayAttribBinding(vertex_array_id_, 2, 2);
+    glEnableVertexAttribArray(2);
   }
 
   void unbind() {
@@ -136,7 +144,7 @@ struct Object {
   std::vector<glm::vec3> indexed_vertices_;
   std::vector<glm::vec2> indexed_uvs_;
   std::vector<glm::vec3> indexed_normals_;
-  std::vector<unsigned int> indices;
+  std::vector<GLuint> indices;
   GLuint vertex_buffer_;
   GLuint normal_buffer_;
   GLuint uv_buffer_;

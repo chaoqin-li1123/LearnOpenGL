@@ -12,8 +12,6 @@ out VS_OUT {
 
 out float view_distance;
 
-
-
 uniform mat4 model_view;
 uniform mat4 projection;
 uniform mat4 MVP;
@@ -24,7 +22,7 @@ void main(){
     // uv of the vertex.
     vs_out.uv = vertex_uv;
     // Normal vector of the vertex in camera space.
-    vs_out.normal_camera_space = normalize((model_view * vec4(vertex_normal_model_space, 0.0)).xyz);
+    vs_out.normal_camera_space = normalize((transpose(inverse(model_view)) * vec4(vertex_normal_model_space, 0.0)).xyz);
 
     gl_Position = MVP * vec4(vertex_position_model_space, 1.0);
 
