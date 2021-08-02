@@ -48,25 +48,26 @@ struct Program {
     glGetShaderiv(shader_id, GL_COMPILE_STATUS, &result);
     glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &error_info_length);
     if (error_info_length > 0) {
-      std::vector<char> error_msg(error_info_length + 1);
+      std::string error_msg(error_info_length + 1, '\0');
       glGetShaderInfoLog(shader_id, error_info_length, NULL, &error_msg[0]);
       printf("%s\n", &error_msg[0]);
       exit(-1);
     }
+    if (result != GL_TRUE) exit(-1);
   }
 
   void linkProgram() {
     glLinkProgram(program_id_);
     GLint result = GL_FALSE;
     int error_info_length;
-    glGetProgramiv(program_id_, GL_COMPILE_STATUS, &result);
+    glGetProgramiv(program_id_, GL_LINK_STATUS, &result);
     glGetProgramiv(program_id_, GL_INFO_LOG_LENGTH, &error_info_length);
     if (error_info_length > 0) {
-      std::vector<char> error_msg(error_info_length + 1);
+      std::string error_msg(error_info_length + 1, '\0');
       glGetProgramInfoLog(program_id_, error_info_length, NULL, &error_msg[0]);
       printf("%s\n", &error_msg[0]);
-      exit(-1);
     }
+    if (result != GL_TRUE) exit(-1);
   }
 
   GLuint program_id_;
