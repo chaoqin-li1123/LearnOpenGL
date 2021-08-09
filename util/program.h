@@ -22,12 +22,14 @@ struct Program {
     for (GLuint shader_id : shader_ids) {
       glDeleteShader(shader_id);
     }
-    glPatchParameteri(GL_PATCH_VERTICES, 3);
   }
 
   GLuint id() { return program_id_; }
   ~Program() { glDeleteProgram(program_id_); }
-  void bind() { glUseProgram(program_id_); }
+  void bind() {
+    glUseProgram(program_id_);
+    // selectSubroutine();
+  }
 
  private:
   GLuint loadShader(const char* shader_file, GLenum shader_type) {
@@ -51,7 +53,6 @@ struct Program {
       std::string error_msg(error_info_length + 1, '\0');
       glGetShaderInfoLog(shader_id, error_info_length, NULL, &error_msg[0]);
       printf("%s\n", &error_msg[0]);
-      exit(-1);
     }
     if (result != GL_TRUE) exit(-1);
   }
@@ -68,6 +69,12 @@ struct Program {
       printf("%s\n", &error_msg[0]);
     }
     if (result != GL_TRUE) exit(-1);
+  }
+
+  void selectSubroutine() {
+    GLuint subroutine_id = glGetSubroutineIndex(program_id_, GL_FRAGMENT_SHADER,
+                                                "gamma_correction");
+    glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &subroutine_id);
   }
 
   GLuint program_id_;

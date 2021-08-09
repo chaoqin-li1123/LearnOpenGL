@@ -25,4 +25,6 @@ bool loadOBJ(const char *path, std::vector<glm::vec3> &out_vertices,
 
 GLuint loadDDS(const char *imagepath);
 
+GLFWwindow *initWindow(const char *window_name);
+
 #endif

@@ -199,3 +199,28 @@ GLuint loadDDS(const char *imagepath) {
 
   return textureID;
 }
+
+GLFWwindow *initWindow(const char *window_name) {
+  glewExperimental = true;
+  if (!glfwInit()) {
+    std::cerr << "Failed to initialize GLFW\n";
+    exit(-1);
+  }
+  // Antialiasing
+  glfwWindowHint(GLFW_SAMPLES, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+  // Open a window.
+  GLFWwindow *window = glfwCreateWindow(1024, 768, window_name, NULL, NULL);
+
+  // Initialize GLEW
+  glfwMakeContextCurrent(window);
+  glewExperimental = true;
+  if (glewInit() != GLEW_OK) {
+    fprintf(stderr, "Failed to initialize GLEW\n");
+    exit(-1);
+  }
+  return window;
+}

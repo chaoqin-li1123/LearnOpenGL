@@ -18,13 +18,14 @@ uniform mat4 MVP;
 
 void main(){  
     // Position of the vertex in camera space.
-    vs_out.vertex_position_camera_space =  (model_view * vec4(vertex_position_model_space,1.0)).xyz;
+    vs_out.vertex_position_camera_space =  (model_view * vec4(vertex_position_model_space, 1.0)).xyz;
+
     // uv of the vertex.
     vs_out.uv = vertex_uv;
     // Normal vector of the vertex in camera space.
     vs_out.normal_camera_space = normalize((transpose(inverse(model_view)) * vec4(vertex_normal_model_space, 0.0)).xyz);
 
-    gl_Position = MVP * vec4(vertex_position_model_space, 1.0);
+    gl_Position = MVP * vec4(vertex_position_model_space + vec3(gl_InstanceID * 1.5, 0.0, 0.0), 1.0);
 
     view_distance = length(vs_out.vertex_position_camera_space);
 }

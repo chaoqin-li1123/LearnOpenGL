@@ -1,6 +1,6 @@
 #version 450 core
 
-layout (triangles, equal_spacing, ccw) in;
+layout (triangles, fractional_even_spacing, ccw) in;
 
 in TCS_OUT
 {
@@ -25,7 +25,8 @@ void pass_data() {
      + gl_TessCoord.z * tes_in[2].uv; 
     tes_out.normal_camera_space = gl_TessCoord.x * tes_in[0].normal_camera_space
      + gl_TessCoord.y * tes_in[1].normal_camera_space
-     + gl_TessCoord.z * tes_in[2].normal_camera_space; 
+     + gl_TessCoord.z * tes_in[2].normal_camera_space;         
+    gl_ClipDistance[0] = tes_out.vertex_position_camera_space.y;
 }
 
 void main() {

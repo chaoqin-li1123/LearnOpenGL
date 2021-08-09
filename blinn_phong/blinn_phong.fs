@@ -1,5 +1,5 @@
 #version 450 core
-
+// Input data
 layout(location = 0) in vec3 vertex_position_model_space;
 layout(location = 1) in vec2 vertex_uv;
 layout(location = 2) in vec3 vertex_normal_model_space;
@@ -15,7 +15,26 @@ layout (binding = 0) uniform sampler2D texture_sampler;
 uniform vec3 light_position_camera_space;
 uniform vec3 light_color;
 
+// Output data
 out vec3 color;
+
+// Subroutine
+subroutine vec3 ProcessColor(vec3 initial_color);
+
+layout (index = 0)
+subroutine (ProcessColor)
+vec3 pass_through(vec3 initial_color) {
+    return initial_color;
+}
+
+layout (index = 1)
+subroutine (ProcessColor)
+vec3 gamma_correction(vec3 initial_color) {
+    float gamma = 2.2;
+    return pow(initial_color, vec3(1.0/gamma));;
+}
+
+subroutine uniform ProcessColor process_color_func;
 
 void main(){
     // Output color = color of the texture at the specified UV
@@ -39,6 +58,5 @@ void main(){
     if (cos_alpha > 0.0) specular_factor = pow(cos_alpha, 32.0);
     vec3 specular = specular_factor * vec3(0.3);
 
-    float gamma = 2.2;
-    color = pow(specular + diffuse + ambient, vec3(1.0/gamma));
+    color = process_color_func(ambient + diffuse + specular);
 }

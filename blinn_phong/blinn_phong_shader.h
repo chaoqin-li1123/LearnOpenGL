@@ -1,15 +1,15 @@
-#ifndef SHADER_H
-#define SHADER_H
+#ifndef BLINN_PHONG_SHADER_H
+#define BLINN_PHONG_SHADER_H
 #include <algorithm>
 #include <memory>
 
-#include "curve.h"
-#include "gl_util.h"
-#include "light.h"
-#include "object.h"
-#include "program.h"
-#include "texture.h"
-#include "transformation.h"
+#include "blinn_phong_object.h"
+#include "util/curve.h"
+#include "util/gl_util.h"
+#include "util/light.h"
+#include "util/program.h"
+#include "util/texture.h"
+#include "util/transformation.h"
 
 struct BlinnPhongShader {
   BlinnPhongShader(const char* object_file, const char* texture_file)
@@ -20,10 +20,26 @@ struct BlinnPhongShader {
         object_(object_file),
         texture_(texture_file),
         transformation_(50.0f, 4.0f / 3.0f, 0.01f, 100.0f) {
+    initGlobal();
+    glPatchParameteri(GL_PATCH_VERTICES, 3);
     initTransformation();
     initCurves();
+    selectSubroutine();
   }
 
+  void display() {
+    program_.bind();
+    texture_.bind(program_.id(), "texture_sampler");
+    bindTransformation();
+    bindLight(glm::vec3(5.0, 4.0, 6.0), glm::vec3(1.0, 1.0, 1.0));
+    object_.bind(program_.id());
+    object_.display();
+    // clean up the vertex array attributes.
+    object_.unbind();
+    frame_idx_++;
+  }
+
+ private:
   // Initialize the model, view and projection matrix.
   void initTransformation() {
     // TODO: allow user to change view using the mouse or keyboard.
@@ -66,93 +82,28 @@ struct BlinnPhongShader {
     light_->bind(program_.id(), transformation_.view());
   }
 
-  void display() {
-    program_.bind();
-    texture_.bind(program_.id(), "texture_sampler");
-    bindTransformation();
-    bindLight(glm::vec3(5.0, 4.0, 6.0), glm::vec3(1.0, 1.0, 1.0));
-    object_.bind(program_.id());
-    object_.display();
-    // clean up the vertex array attributes.
-    object_.unbind();
-    frame_idx_++;
+  void selectSubroutine() {
+    GLuint subroutine_id = glGetSubroutineIndex(
+        program_.id(), GL_FRAGMENT_SHADER, "gamma_correction");
+    glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &subroutine_id);
   }
 
- private:
+  void initGlobal() {
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_CLIP_DISTANCE0);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }
+
   Program program_;
-  Object object_;
+  BlinnPhongObject object_;
   Texture texture_;
   std::unique_ptr<Light> light_;
   Transformation transformation_;
   Spline curves_;
   size_t frame_idx_{};
-};
-
-struct CheckBoardShader {
-  CheckBoardShader()
-      : program_({"blinn_phong/checkboard.vs", "blinn_phong/checkboard.fs"},
-                 {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER}) {
-    float x1 = -0.9, x2 = 0.9, y1 = -0.9, y2 = 0.9;
-
-    vertices_.emplace_back(x2, y1, -1.0);
-    vertices_.emplace_back(x1, y2, -1.0);
-    vertices_.emplace_back(x1, y1, -1.0);
-
-    vertices_.emplace_back(x2, y1, -1.0);
-    vertices_.emplace_back(x2, y2, -1.0);
-    vertices_.emplace_back(x1, y2, -1.0);
-
-    initVAO();
-    initVBO();
-  }
-
-  void initVAO() {
-    glCreateVertexArrays(1, &vertex_array_id_);
-    glBindVertexArray(vertex_array_id_);
-  }
-
-  void initVBO() {
-    glCreateBuffers(1, &vertex_buffer_);
-    glNamedBufferStorage(vertex_buffer_, vertices_.size() * sizeof(glm::vec3),
-                         &vertices_[0], GL_MAP_READ_BIT);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
-  }
-
-  void bind(GLuint program_id) {
-    // Bind vertices buffer.
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
-    glVertexAttribPointer(0,         // attribute 0.
-                          3,         // size
-                          GL_FLOAT,  // type
-                          GL_FALSE,  // normalized?
-                          0,         // stride
-                          (void*)0   // array buffer offset
-    );
-  }
-
-  void unbind() { glDisableVertexAttribArray(0); }
-
-  void display() {
-    program_.bind();
-    bind(program_.id());
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDrawArrays(GL_TRIANGLES, 0, vertices_.size());
-    glDisable(GL_BLEND);
-    unbind();
-  }
-
-  ~CheckBoardShader() {
-    glDeleteBuffers(1, &vertex_buffer_);
-    glDeleteVertexArrays(1, &vertex_array_id_);
-  }
-
- private:
-  Program program_;
-  std::vector<glm::vec3> vertices_;
-  GLuint vertex_buffer_;
-  GLuint vertex_array_id_;
 };
 
 #endif
